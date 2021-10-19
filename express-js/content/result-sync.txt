@@ -1,0 +1,1 @@
+Here is the result : first text second textHere is the result : first text, second text

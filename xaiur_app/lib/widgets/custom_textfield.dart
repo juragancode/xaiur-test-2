@@ -11,9 +11,11 @@ class CustomTextField extends StatelessWidget {
   final TextInputAction? inputAction;
   final TextInputType? keyboardType;
   final Widget? suffix;
+  final Widget? prefix;
 
   CustomTextField(
       {this.hint,
+      this.prefix,
       this.suffix,
       this.fontSize,
       this.fontWeight,
@@ -33,17 +35,18 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText ?? false,
       keyboardType: keyboardType ?? TextInputType.text,
       cursorColor: Colors.black,
-      style: Theme.of(context).textTheme.overline!.copyWith(
-            color: Colors.black,
-            fontWeight: fontWeight,
-            fontSize: fontSize,
-          ),
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: fontWeight,
+        fontSize: fontSize,
+      ),
       decoration: InputDecoration(
         focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(
           color: Color(0xFFE31E24),
         )),
         suffix: suffix,
+        prefix: prefix,
         contentPadding: EdgeInsets.all(16.0),
         hintText: hint,
         hintStyle: TextStyle(

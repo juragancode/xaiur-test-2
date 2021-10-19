@@ -1,6 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:xaiur_app/widgets/custom_elevated.dart';
+
 import 'package:xaiur_app/widgets/custom_textfield.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -14,6 +19,12 @@ class _AuthScreenState extends State<AuthScreen> {
   PageController _controller = PageController();
   bool _isTap1 = true;
   bool _isTap2 = false;
+
+  DateTime selectedDate = DateTime.now();
+  bool isDatePicked = false;
+  bool isHide = false;
+  String? valueChoose;
+  List listItem = ["Laki-laki", "Perempuan", "Lainnya"];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -240,12 +251,166 @@ class _AuthScreenState extends State<AuthScreen> {
                 onChanged: (val) {},
               ),
               SizedBox(height: 15.0),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      width: 1.0,
+                      color: Color(0xFF707070).withOpacity(0.5),
+                    ),
+                  ),
+                ),
+                height: 50,
+                width: Get.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: isDatePicked
+                          ? Text(
+                              new DateFormat("dd MMMM yyyy")
+                                  .format(selectedDate),
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            )
+                          : Text(
+                              "Tanggal lahir",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Color(0xFF707070),
+                              ),
+                            ),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        DateTime? picked = await showRoundedDatePicker(
+                          context: context,
+                          height: Get.height / 2.7,
+                          theme: ThemeData(
+                            primaryColor: Color(0xFFE31E24),
+                            accentColor: Color(0xFFE31E24),
+                            textTheme: TextTheme(
+                              bodyText2: TextStyle(
+                                color: Colors.black,
+                              ),
+                              caption: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          styleDatePicker: MaterialRoundedDatePickerStyle(
+                            textStyleCurrentDayOnCalendar: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            textStyleDayOnCalendar: TextStyle(
+                              fontSize: 16,
+                            ),
+                            textStyleDayOnCalendarSelected: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            textStyleDayOnCalendarDisabled:
+                                TextStyle(fontSize: 16),
+                            textStyleMonthYearHeader: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            paddingDatePicker: EdgeInsets.all(0),
+                            paddingMonthHeader: EdgeInsets.all(10),
+                            paddingActionBar: EdgeInsets.zero,
+                            paddingDateYearHeader: EdgeInsets.all(10),
+                            sizeArrow: 20,
+                            colorArrowNext: Color(0xFF707070),
+                            colorArrowPrevious: Color(0xFF707070),
+                          ),
+                          initialDate: selectedDate, // Refer step 1
+                          firstDate: DateTime(1500),
+                          lastDate: DateTime(3000),
+                        );
+                        setState(() {
+                          if (picked != null && picked != selectedDate) {
+                            selectedDate = picked;
+                            isDatePicked = true;
+                          }
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: isDatePicked
+                            ? [Icon(Icons.expand_more)]
+                            : [
+                                Text(
+                                  new DateFormat("dd-MM-yyyy")
+                                      .format(selectedDate),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(Icons.expand_more)
+                              ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 15.0),
               CustomTextField(
                 inputAction: TextInputAction.next,
+                keyboardType: TextInputType.phone,
                 hint: 'No. Handphone',
                 fontSize: 18.0,
                 fontWeight: FontWeight.normal,
                 onChanged: (val) {},
+              ),
+              SizedBox(height: 15.0),
+              Container(
+                height: 50,
+                width: Get.width,
+                child: DropdownButton(
+                  isExpanded: true,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                  underline: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color(0xFF707070),
+                        ),
+                      ),
+                    ),
+                  ),
+                  icon: Icon(Icons.expand_more),
+                  hint: Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Text(
+                      "Jenis kelamin",
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  items: listItem.map((valueItem) {
+                    return DropdownMenuItem(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Text(valueItem),
+                      ),
+                      value: valueItem,
+                    );
+                  }).toList(),
+                  value: valueChoose,
+                  onChanged: (newValue) {
+                    setState(() {
+                      valueChoose = newValue as String?;
+                    });
+                  },
+                ),
               ),
               SizedBox(height: 15.0),
               ..._emailAndPassword(),
@@ -260,8 +425,6 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       );
-
-  bool isHide = false;
 
   List<Widget> _emailAndPassword() => [
         CustomTextField(
@@ -285,14 +448,14 @@ class _AuthScreenState extends State<AuthScreen> {
               });
             },
             child: Icon(
-              isHide ? Icons.visibility : Icons.visibility_off,
+              isHide ? Icons.visibility_off : Icons.visibility,
               size: 20,
             ),
           ),
           inputAction: TextInputAction.done,
           hint: 'Password',
           fontSize: 18.0,
-          obscureText: isHide ? true : false,
+          obscureText: isHide ? false : true,
           fontWeight: FontWeight.normal,
           onChanged: (val) {},
         )
