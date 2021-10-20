@@ -1,15 +1,16 @@
 @extends('dashboard.layouts.main')
 @section('container')
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Create Post</h1>
+        <h1 class="h2">Edit Post</h1>
     </div>
     <div class="col-lg-8">
-        <form action="/dashboard/posts" method="POST" enctype="multipart/form-data">
+        <form action="/dashboard/posts/{{ $post->slug }}" method="POST" enctype="multipart/form-data">
+            @method('put')
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" required
-                    autofocus value="{{ old('title') }}">
+                    autofocus value="{{ old('title', $post->title) }}">
                 @error('title')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -18,7 +19,8 @@
             </div>
             <div class="mb-3">
                 <label for="slug" class="form-label @error('slug') is-invalid @enderror">Slug</label>
-                <input type="text" class="form-control" id="slug" name="slug" required value="{{ old('slug') }}">
+                <input type="text" class="form-control" id="slug" name="slug" required
+                    value="{{ old('slug', $post->slug) }}">
                 @error('slug')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -31,13 +33,19 @@
                     <option selected>Select Category</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}"
-                            {{ old('category_id') == $category->id ? ' selected' : ' ' }}>{{ $category->name }}</option>
+                            {{ old('category_id', $post->category_id) == $category->id ? ' selected' : ' ' }}>
+                            {{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Cover Image</label>
-                <img class="img-preview img-fluid mb-3 col-sm-5">
+                <input type="hidden" name="oldImage" value="{{ $post->image }}">
+                @if ($post->image)
+                    <img src="{{ asset('storage/' . $post->image) }}" class="img-preview img-fluid mb-3 col-sm-5 d-block">
+                @else
+                    <img class="img-preview img-fluid mb-3 col-sm-5 d-block">
+                @endif
                 <input class="form-control @error('image') is-invalid @enderror" type="file" id="image" name="image"
                     onchange="previewImage()">
                 @error('image')
@@ -51,10 +59,10 @@
                 @error('body')
                     <p class="text-danger">{{ $message }}</p>
                 @enderror
-                <input id="body" type="hidden" name="body" required value="{{ old('body') }}">
+                <input id="body" type="hidden" name="body" required value="{{ old('body', $post->body) }}">
                 <trix-editor input="body"></trix-editor>
             </div>
-            <button class="btn btn-primary" type="submit">Create Post</button>
+            <button class="btn btn-primary" type="submit">Update Post</button>
         </form>
     </div>
 
